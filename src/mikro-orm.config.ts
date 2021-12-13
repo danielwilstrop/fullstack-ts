@@ -2,9 +2,10 @@ import { __production__ } from './constants'
 import { Post } from './entities/post'
 import { MikroORM } from '@mikro-orm/core'
 import path from 'path'
+import { User } from './entities/user'
 
 export default {
-  entities: [Post],
+  entities: [Post, User],
   dbName: 'danielwilstrop',
   type: 'postgresql',
   port: 1234,
