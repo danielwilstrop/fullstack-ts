@@ -11,7 +11,7 @@ export default {
   port: 1234,
   migrations: {
     path: path.join(__dirname, './migrations'), // path to the folder with migrations
-    pattern: /^[\w-]+\d+\.[tj]s$/
+    pattern: /^[\w-]+\d+\.[tj]s$/ // regex pattern for the migration files, end changed fron default
   },
   debug: !__production__
 } as Parameters<typeof MikroORM.init>[0]

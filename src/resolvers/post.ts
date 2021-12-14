@@ -2,6 +2,7 @@ import { Post } from '../entities/post'
 import { MyContext } from 'src/types'
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql'
 
+// Resolver for Posts Entity
 @Resolver()
 export class PostResolver {
   @Query(() => [Post], { nullable: true })

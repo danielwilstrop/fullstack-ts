@@ -11,6 +11,7 @@ import {
 import { User } from '../entities/User'
 import argon2 from 'argon2'
 
+//Creating types for the resolvers
 @InputType()
 class UsernamePasswordInput {
   @Field()
@@ -35,6 +36,7 @@ class UserResponse {
   user?: User
 }
 
+//Resolver for User Entity
 @Resolver()
 export class UserResolver {
   @Mutation(() => UserResponse)
