@@ -34,8 +34,8 @@ const main = async () => {
 
   app.use(
     cors({
-      origin: 'https://studio.apollographql.com',
-      credentials: true
+      credentials: true,
+      origin: 'http://localhost:3000'
     })
   )
 
@@ -54,7 +54,7 @@ const main = async () => {
       },
       secret: 'khjfweuygdljiqw', //secret for signing the cookie - to be moved to ENV later
       saveUninitialized: false,
-      resave: false
+      resave: true
     })
   )
 
@@ -72,10 +72,10 @@ const main = async () => {
   apolloServer.applyMiddleware({
     app,
     cors: false
-  }) //
+  })
 
   app.listen(4000, () => {
-    console.log('Listening on port 3000:')
+    console.log(`Listening on port: 4000`)
   })
 }
 

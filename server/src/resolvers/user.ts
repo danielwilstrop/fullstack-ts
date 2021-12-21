@@ -11,6 +11,7 @@ import {
 } from 'type-graphql'
 import { User } from '../entities/User'
 import argon2 from 'argon2'
+import { EntityManager } from '@mikro-orm/postgresql'
 
 //Creating types for the resolvers
 @InputType()
@@ -19,6 +20,8 @@ class UsernamePasswordInput {
   username: string
   @Field()
   password: string
+  @Field()
+  confirmPassword: string
 }
 
 @ObjectType()
@@ -53,9 +56,19 @@ export class UserResolver {
   @Mutation(() => UserResponse)
   async register(
     @Arg('options') options: UsernamePasswordInput,
-    @Ctx() { em }: MyContext
+    @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
-    if (options.username.length <= 3) {
+    if (options.password !== options.confirmPassword) {
+      return {
+        errors: [
+          {
+            field: 'confirmPassword',
+            message: 'passwords do not match'
+          }
+        ]
+      }
+    }
+    if (options.username.length < 3) {
       return {
         errors: [
           {
@@ -65,7 +78,7 @@ export class UserResolver {
         ]
       }
     }
-    if (options.password.length <= 6) {
+    if (options.password.length < 6) {
       return {
         errors: [
           {
@@ -76,13 +89,19 @@ export class UserResolver {
       }
     }
     const hashedPassword = await argon2.hash(options.password)
-    const user = em.create(User, {
-      username: options.username,
-      password: hashedPassword
-    })
+    let user
     try {
-      await em.persistAndFlush(user)
-      return { user }
+      const results = await (em as EntityManager)
+        .createQueryBuilder(User)
+        .getKnexQuery()
+        .insert({
+          username: options.username,
+          password: hashedPassword,
+          created_at: new Date(),
+          updated_at: new Date()
+        })
+        .returning('*')
+      user = results[0]
     } catch (error) {
       if (error.code === '23505' || error.detail.includes('already exists')) {
         //duplicate username error
@@ -104,6 +123,7 @@ export class UserResolver {
         ]
       }
     }
+    req.session.userId = user.id
     return { user }
   }
 
