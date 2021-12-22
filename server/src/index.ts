@@ -1,5 +1,5 @@
 import { MikroORM } from '@mikro-orm/core'
-import { __production__ } from './constants'
+import { COOKIE_NAME, __production__ } from './constants'
 import mikroConfig from './mikro-orm.config'
 import 'reflect-metadata'
 import express from 'express'
@@ -41,7 +41,7 @@ const main = async () => {
 
   app.use(
     session({
-      name: 'danwil', //name of cookie
+      name: COOKIE_NAME,
       store: new RedisStore({
         client: redis,
         disableTouch: true

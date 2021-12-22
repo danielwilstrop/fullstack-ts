@@ -12,6 +12,7 @@ import {
 import { User } from '../entities/User'
 import argon2 from 'argon2'
 import { EntityManager } from '@mikro-orm/postgresql'
+import { COOKIE_NAME } from '../constants'
 
 //Creating types for the resolvers
 @InputType()
@@ -20,8 +21,8 @@ class UsernamePasswordInput {
   username: string
   @Field()
   password: string
-  @Field()
-  confirmPassword: string
+  @Field(() => String, { nullable: true })
+  confirmPassword?: string
 }
 
 @ObjectType()
@@ -163,5 +164,20 @@ export class UserResolver {
     return {
       user
     }
+  }
+
+  @Mutation(() => Boolean)
+  logout(@Ctx() { req, res }: MyContext) {
+    return new Promise((resolve) =>
+      req.session.destroy((error) => {
+        res.clearCookie(COOKIE_NAME)
+        if (error) {
+          console.log(error)
+          resolve(false)
+          return
+        }
+        resolve(true)
+      })
+    )
   }
 }
