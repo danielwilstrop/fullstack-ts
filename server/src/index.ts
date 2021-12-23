@@ -24,6 +24,7 @@ declare module 'express-session' {
 
 const main = async () => {
   const orm = await MikroORM.init(mikroConfig)
+
   const migrator = orm.getMigrator()
   await migrator.up() // run all migrations
 
