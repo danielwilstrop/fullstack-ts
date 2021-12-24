@@ -66,7 +66,7 @@ const main = async () => {
       validate: false
     }),
 
-    context: ({ req, res }): MyContext => ({ em: orm.em, req, res })
+    context: ({ req, res }): MyContext => ({ em: orm.em, req, res, redis })
   })
 
   await apolloServer.start()
