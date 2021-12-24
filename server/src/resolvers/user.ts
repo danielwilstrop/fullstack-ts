@@ -78,8 +78,8 @@ export class UserResolver {
       return {
         errors: [
           {
-            field: 'newPassword',
-            message: 'Token expired or invalid'
+            field: 'token',
+            message: 'Password Reset Token expired or invalid'
           }
         ]
       }
@@ -98,7 +98,10 @@ export class UserResolver {
     }
     const hashedPassword = await argon2.hash(newPassword)
     user.password = hashedPassword
-    em.persistAndFlush(user)
+    await em.persistAndFlush(user)
+
+    //destroy token so cant reuse
+    await redis.del(FORGOT_PASSWORD_PREFIX + token)
 
     //Logs user in after password change is successful
     req.session.userId = user.id

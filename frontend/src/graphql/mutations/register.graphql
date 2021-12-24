@@ -12,11 +12,6 @@ mutation Register(
       email: $email
     }
   ) {
-    errors {
-      ...RegularError
-    }
-    user {
-      ...RegularUser
-    }
+    ...RegularUserResponse
   }
 }
