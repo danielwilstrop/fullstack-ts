@@ -1,6 +1,4 @@
-import { MikroORM } from '@mikro-orm/core'
 import { COOKIE_NAME, __production__ } from './constants'
-import mikroConfig from './mikro-orm.config'
 import 'reflect-metadata'
 import express from 'express'
 import { ApolloServer } from 'apollo-server-express'
@@ -14,6 +12,9 @@ import connectRedis from 'connect-redis'
 import { MyContext } from './types'
 import Redis from 'ioredis'
 import cors from 'cors'
+import { createConnection } from 'typeorm'
+import { Post } from './entities/post'
+import { User } from './entities/user'
 
 //A fix to the types so we can add the userID to the session object on user login (thanks StackOverflow!)
 declare module 'express-session' {
@@ -23,10 +24,16 @@ declare module 'express-session' {
 }
 
 const main = async () => {
-  const orm = await MikroORM.init(mikroConfig)
-
-  const migrator = orm.getMigrator()
-  await migrator.up() // run all migrations
+  const conn = createConnection({
+    type: 'postgres',
+    database: 'template1',
+    username: 'postgres',
+    password: 'postgres',
+    logging: true,
+    synchronize: true,
+    entities: [Post, User]
+  })
+  console.log(conn)
 
   const app = express()
 
@@ -66,7 +73,7 @@ const main = async () => {
       validate: false
     }),
 
-    context: ({ req, res }): MyContext => ({ em: orm.em, req, res, redis })
+    context: ({ req, res }): MyContext => ({ req, res, redis })
   })
 
   await apolloServer.start()
