@@ -33,7 +33,8 @@ const main = async () => {
     synchronize: true,
     entities: [Post, User]
   })
-  console.log(conn)
+
+  conn.catch((err) => console.log(err))
 
   const app = express()
 
