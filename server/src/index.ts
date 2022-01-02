@@ -15,6 +15,7 @@ import cors from 'cors'
 import { createConnection } from 'typeorm'
 import { Post } from './entities/post'
 import { User } from './entities/user'
+import path from 'path'
 
 //A fix to the types so we can add the userID to the session object on user login (thanks StackOverflow!)
 declare module 'express-session' {
@@ -24,17 +25,18 @@ declare module 'express-session' {
 }
 
 const main = async () => {
-  const conn = createConnection({
+  const conn = await createConnection({
     type: 'postgres',
     database: 'template1',
     username: 'postgres',
     password: 'postgres',
     logging: true,
     synchronize: true,
+    migrations: [path.join(__dirname, './migrations/*')],
     entities: [Post, User]
   })
 
-  conn.catch((err) => console.log(err))
+  conn.runMigrations()
 
   const app = express()
 
